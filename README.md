@@ -1,16 +1,55 @@
-# React + Vite
+# 🍕 One Way Pizza — Sistema de Gestión para Restaurantes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**One Way Pizza** es una aplicación web desarrollada con **React + Supabase** que permite administrar las operaciones de un restaurante: ventas, caja, empleados, horarios y reportes financieros.
 
-Currently, two official plugins are available:
+Diseñada especialmente para negocios locales, ofrece una interfaz moderna, ágil y segura, con autenticación por Google y un control completo de la caja diaria.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Características principales
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+✅ **Autenticación con Google** (Supabase Auth)
+✅ **Gestión de Caja** (apertura, cierre, movimientos)
+✅ **Registro de Ventas y Detalles de Venta**
+✅ **Panel de Administración y Empleado**
+✅ **Gestión de Horarios de Empleados**
+✅ **Reportes financieros y exportación CSV**
+✅ **Interfaz moderna con Styled Components + SweetAlert2**
+✅ **Modo oscuro y claro (Theme toggle)**
+✅ **Desplegado en Vercel + Supabase (DB y Auth)**
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🏗️ Tecnologías utilizadas
+
+| Categoría | Herramienta / Librería |
+|------------|------------------------|
+| **Frontend** | React 19, Vite, Styled Components |
+| **Backend / DB** | Supabase (PostgreSQL + Auth + Storage) |
+| **UI / UX** | Material UI, SweetAlert2, Recharts |
+| **Gestión de estado** | Zustand |
+| **Hosting** | Vercel |
+| **Control de versiones** | Git & GitHub |
+
+---
+
+## ⚙️ Instalación local
+
+Si deseas probar el proyecto en tu máquina local:
+
+```bash
+# 1️⃣ Clonar el repositorio
+git clone https://github.com/Luismel06/one-way-pizza.git
+
+# 2️⃣ Entrar al directorio
+cd one-way-pizza
+
+# 3️⃣ Instalar dependencias
+npm install
+
+# 4️⃣ Crear archivo .env con tus credenciales de Supabase
+VITE_APP_SUPABASE_URL=tu_url_de_supabase
+VITE_APP_SUPABASE_ANON_KEY=tu_anon_key
+
+# 5️⃣ Ejecutar en modo desarrollo
+npm run dev
