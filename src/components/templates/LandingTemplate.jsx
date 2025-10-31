@@ -1,109 +1,90 @@
 // src/components/templates/LandingTemplate.jsx
 import styled from "styled-components";
+import fondo2 from "../../assets/fondo2.jpg"; // ✅ Usa el mismo fondo del login
 import { useNavigate } from "react-router-dom";
-import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 
-// ✅ Primero declaramos los styled-components:
-const LandingContainer = styled.div`
-  height: 100vh;
-  width: 100%;
-  position: relative;
-  background-image: url("https://images.unsplash.com/photo-1601924582971-259b69e70b0b?auto=format&fit=crop&w=1920&q=80");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
-`;
-
-const Overlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-`;
-
-const Content = styled.div`
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  gap: 1.5rem;
-  padding: 2rem;
-`;
-
-const Logo = styled.img`
-  width: 130px;
-  animation: flotar 2s ease-in-out infinite alternate;
-
-  @keyframes flotar {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(-10px);
-    }
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-
-  span {
-    color: #f88533;
-  }
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  color: #ddd;
-`;
-
-const Button = styled.button`
-  background: #f88533;
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding: 0.8rem 2rem;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: 0.3s ease;
-  box-shadow: 0 0 10px #f88533a0;
-
-  &:hover {
-    background: #ff9b4f;
-    box-shadow: 0 0 20px #f88533d0;
-    transform: scale(1.05);
-  }
-`;
-
-// ✅ Luego exportamos el componente que los usa:
 export function LandingTemplate() {
   const navigate = useNavigate();
 
   return (
     <LandingContainer>
       <Overlay />
-      <Content>
-        <Logo src="/OWP-LOGO.png" alt="One Way Pizza" />
-        <Title>
-          Bienvenido a <span>One Way Pizza</span>
-        </Title>
-        <Subtitle>Gestión eficiente, sabor inigualable 🍕</Subtitle>
-        <Button onClick={() => navigate("/login")}>
-          <Icon icon="mdi:login" width="24" />
+      <Content
+        as={motion.div}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+        <h1>🍕 Bienvenido a <span>One Way Pizza</span></h1>
+        <p>El sistema de gestión diseñado para tu restaurante.</p>
+
+        <Button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/login")}
+        >
           Acceder
         </Button>
       </Content>
     </LandingContainer>
   );
 }
+
+/* 🎨 Estilos */
+const LandingContainer = styled.div`
+  background: url(${fondo2}) center/cover no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+`;
+
+const Content = styled.div`
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+
+    span {
+      color: #ff8c32;
+    }
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #ddd;
+    margin-bottom: 30px;
+  }
+`;
+
+const Button = styled(motion.button)`
+  background-color: #ff8c32;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 14px 38px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 140, 50, 0.3);
+
+  &:hover {
+    background-color: #ff9e50;
+    box-shadow: 0 6px 14px rgba(255, 140, 50, 0.5);
+  }
+`;
