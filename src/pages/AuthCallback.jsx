@@ -1,25 +1,27 @@
+// src/pages/AuthCallback.jsx
 import { useEffect } from "react";
 import { supabase } from "../supabase/supabase.config.jsx";
 
 export function AuthCallback() {
   useEffect(() => {
     const validar = async () => {
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
+      const { data, error } = await supabase.auth.getSession();
+      const session = data?.session;
 
-      if (!session?.user) {
+      if (error || !session?.user) {
         window.location.href = "/login";
         return;
       }
 
       const email = session.user.email;
-      const { data: usuario } = await supabase
+
+      const { data: usuario, error: userError } = await supabase
         .from("usuarios")
         .select("*")
         .eq("correo", email)
         .single();
 
-      if (!usuario || !usuario.activo) {
+      if (userError || !usuario || !usuario.activo) {
         await supabase.auth.signOut();
         window.location.href = "/login";
         return;

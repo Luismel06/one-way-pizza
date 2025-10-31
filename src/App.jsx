@@ -16,15 +16,11 @@ function App() {
   const { themeStyle } = useThemeStore();
   const { pathname } = useLocation();
 
-  // ✅ Ocultar sidebar y login en rutas públicas (Landing, Login, Callback)
-  const rutasPublicas = ["/", "/login", "/auth/callback"];
-  const esRutaPublica = rutasPublicas.includes(pathname);
-
   return (
     <ThemeProvider theme={themeStyle}>
       <AuthContextProvider>
         <GlobalStyles />
-        {!esRutaPublica ? (
+        {pathname !== "/login" ? (
           <Container className={sidebarOpen ? "active" : ""}>
             <section className="contentSidebar">
               <Sidebar
@@ -38,8 +34,7 @@ function App() {
             </section>
           </Container>
         ) : (
-          // ✅ Si es ruta pública, muestra solo el contenido del router (Landing, Login, etc.)
-          <MyRoutes />
+          <Login />
         )}
       </AuthContextProvider>
     </ThemeProvider>
