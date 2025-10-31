@@ -14,6 +14,7 @@ export * from './components/templates/FinanzasTemplate';
 export * from './components/templates/VentasTemplate';
 export * from './components/templates/DetallesVentasTemplate.jsx';
 export * from './components/templates/HorariosTemplate.jsx';
+export * from './components/templates/LandingTemplate.jsx';
 
 // 📄 Páginas
 export * from './pages/HomeAdmin.jsx';
@@ -25,6 +26,7 @@ export * from './pages/Ventas';
 export * from './pages/detalles-ventas.jsx';
 export * from './pages/AuthCallback.jsx';
 export * from './pages/Horarios.jsx';
+export * from './pages/Landing.jsx';
 
 // 🧭 Rutas
 export * from './routers/routes';
