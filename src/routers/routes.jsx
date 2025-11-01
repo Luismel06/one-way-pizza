@@ -1,5 +1,5 @@
 // src/routers/routes.jsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import {
   Login,
   Caja,
@@ -39,6 +39,9 @@ export function MyRoutes() {
         <Route path="/empleado/caja" element={<Caja />} />
         <Route path="/empleado/horarios" element={<Horarios />} />
       </Route>
+
+      {/* 🧭 Redirección por defecto */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
