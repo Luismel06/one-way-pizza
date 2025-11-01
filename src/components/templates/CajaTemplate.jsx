@@ -8,8 +8,8 @@ import { mostrarProductos } from "../../supabase/crudProductos";
 import { mostrarCategorias } from "../../supabase/crudCategorias";
 import { insertVenta } from "../../supabase/crudVentas";
 import { insertDetalleVenta } from "../../supabase/crudDetallesVentas";
-import { PreviewFactura } from "../../utils/previewFactura.jsx";
-import { imprimirFactura } from "../../utils/imprimirFactura";
+//import { PreviewFactura } from "../../utils/previewFactura.jsx";
+//import { imprimirFactura } from "../../utils/imprimirFactura";
 
 
 const STORAGE_URL =
@@ -427,210 +427,182 @@ async function retirarDineroHandler() {
   // (Usamos la utilidad importada desde ../../utils/previewFactura)
 
   async function confirmarVenta() {
-    if (procesandoVenta) return;
-    setProcesandoVenta(true);
+  if (procesandoVenta) return;
+  setProcesandoVenta(true);
 
-    try {
-      const caja = await getCajaActiva();
-      if (!caja) {
-        await Swal.fire("No hay caja abierta", "", "warning");
-        return;
-      }
-      if (carrito.length === 0) {
-        await Swal.fire("Carrito vacío", "", "warning");
-        return;
-      }
+  try {
+    const caja = await getCajaActiva();
+    if (!caja) {
+      await Swal.fire("No hay caja abierta", "", "warning");
+      return;
+    }
+    if (carrito.length === 0) {
+      await Swal.fire("Carrito vacío", "", "warning");
+      return;
+    }
 
-      const total = calcularTotal();
+    const total = calcularTotal();
 
-      if (
-        metodoPago === "Efectivo" &&
-        (!montoRecibido || parseFloat(montoRecibido) < total)
-      ) {
-        await Swal.fire(
-          "Monto insuficiente",
-          "El monto recibido no cubre el total",
-          "error"
-        );
-        return;
-      }
+    if (
+      metodoPago === "Efectivo" &&
+      (!montoRecibido || parseFloat(montoRecibido) < total)
+    ) {
+      await Swal.fire(
+        "Monto insuficiente",
+        "El monto recibido no cubre el total",
+        "error"
+      );
+      return;
+    }
 
-      // 1️⃣ Insertar venta
-      const venta = await insertVenta({
-        empleado_id: empleado?.id_usuario,
-        caja_id: caja.id,
-        total,
-        metodo_pago: metodoPago,
-        activo: true,
-      });
-      if (!venta) throw new Error("No se pudo crear la venta");
+    // 1️⃣ Insertar venta
+    const venta = await insertVenta({
+      empleado_id: empleado?.id_usuario,
+      caja_id: caja.id,
+      total,
+      metodo_pago: metodoPago,
+      activo: true,
+    });
+    if (!venta) throw new Error("No se pudo crear la venta");
 
-      // 2️⃣ Insertar detalles
-      const detalles = carrito.map((item) => ({
-        venta_id: venta.id,
-        producto_id: item.id_productos,
-        cantidad: item.cantidad,
-        precio_unitario: item.precio,
-        nombre: item.nombre,
-        total: item.precio * item.cantidad,
-      }));
-      await insertDetalleVenta(detalles);
+    // 2️⃣ Insertar detalles
+    const detalles = carrito.map((item) => ({
+      venta_id: venta.id,
+      producto_id: item.id_productos,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio,
+      nombre: item.nombre,
+      total: item.precio * item.cantidad,
+    }));
+    await insertDetalleVenta(detalles);
 
-      /*// 3️⃣ Actualizar caja
-      const nuevasVentasTotales = (caja.ventas_totales || 0) + total;
-      let ventasEfectivo = caja.ventas_efectivo || 0;
-      let totalFinal = caja.total_final || 0;
+    // 3️⃣ Crear datos factura
+    const ventaData = {
+      id: venta.id,
+      fecha: new Date(),
+      empleado: empleado?.nombre || "Empleado",
+    };
+    const efectivoRecibido = parseFloat(montoRecibido) || 0;
 
-      if (metodoPago === "Efectivo") {
-        ventasEfectivo += total;
-        totalFinal += total;
-      }
+    // 4️⃣ Abrir ventana factura (lista para imprimir)
+    const ventanaFactura = window.open("", "_blank", "width=420,height=720,scrollbars=no,resizable=no");
+    if (!ventanaFactura) {
+      Swal.fire("Bloqueada", "Habilita las ventanas emergentes para imprimir.", "warning");
+      return;
+    }
 
-      const { error: errUpd } = await supabase
-        .from("caja")
-        .update({
-          ventas_totales: nuevasVentasTotales,
-          ventas_efectivo: ventasEfectivo,
-          total_final: totalFinal,
-          motivo: `Venta (${metodoPago}): RD$${total.toFixed(2)}`,
-        })
-        .eq("id", caja.id);
-      if (errUpd) throw errUpd;*/
+    ventanaFactura.document.open();
+    ventanaFactura.document.write(`
+      <!DOCTYPE html>
+      <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Factura - One Way Pizza</title>
+          <style>
+            body {
+              font-family: 'Courier New', monospace;
+              background: #fff;
+              color: #000;
+              width: 302px;
+              margin: 0 auto;
+              text-align: center;
+              padding: 10px;
+              font-size: 15px;
+            }
+            img.logo {
+              width: 120px;
+              height: auto;
+              margin-bottom: 6px;
+              filter: grayscale(100%);
+            }
+            h2 {
+              margin: 6px 0;
+              font-size: 22px;
+              font-weight: bold;
+            }
+            p { margin: 3px 0; }
+            .line {
+              margin: 6px 0;
+              border-bottom: 1px dashed #000;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 8px;
+              font-size: 14px;
+            }
+            td {
+              padding: 2px 0;
+            }
+            .right { text-align: right; }
+            .center { text-align: center; }
+          </style>
+        </head>
+        <body>
+          <img src="/OWP-LOGO.png" class="logo" alt="One Way Pizza" />
+          <h2>ONE WAY PIZZA</h2>
+          <p>Carretera Los Jovillos - Puerto Viejo de Azua</p>
+          <p>Tel: +1 (829) 255-7898</p>
+          <div class="line"></div>
 
-      /* USAMOS UN TRIGGER EN LA BASE DE DATOS PARA ACTUALIZAR LA CAJA
-      4️⃣ (Opcional) Registrar movimiento de venta MANUAL si tu trigger NO lo hace
-      if (LOG_VENTA_EN_MOVIMIENTOS) {
-        await registrarMovimiento(
-          "venta",
-          total,
-          `Venta (${metodoPago}): RD$${total.toFixed(2)}`
-        );
-      }
-        */
-      // ✅ Generar factura térmica en nueva ventana (popup visible)
-const ventaData = {
-  id: venta.id,
-  fecha: new Date(),
-  empleado: empleado?.nombre || "Empleado",
-};
-const efectivoRecibido = parseFloat(montoRecibido) || 0;
+          <p><b>Factura #${ventaData.id}</b></p>
+          <p>${ventaData.fecha.toLocaleString()}</p>
+          <div class="line"></div>
 
-// Abrir ventana emergente y esperar que cargue el DOM
-const ventanaFactura = window.open("", "_blank", "width=420,height=720,scrollbars=yes,resizable=yes");
-if (!ventanaFactura) {
-  Swal.fire("Bloqueada", "Habilita las ventanas emergentes para ver la factura.", "warning");
-  return;
+          <table>
+            <thead>
+              <tr>
+                <td><b>Producto</b></td>
+                <td class="center"><b>Cant</b></td>
+                <td class="right"><b>Precio</b></td>
+              </tr>
+            </thead>
+            <tbody>
+              ${detalles.map(item => `
+                <tr>
+                  <td>${item.nombre}</td>
+                  <td class="center">${item.cantidad}</td>
+                  <td class="right">RD$${item.precio_unitario.toFixed(2)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+
+          <div class="line"></div>
+          <p class="right"><b>Total:</b> RD$${total.toFixed(2)}</p>
+          <p class="right"><b>Efectivo:</b> RD$${efectivoRecibido.toFixed(2)}</p>
+          <p class="right"><b>Devuelta:</b> RD$${(efectivoRecibido - total).toFixed(2)}</p>
+          <div class="line"></div>
+          <p>Atendido por: <b>${ventaData.empleado}</b></p>
+          <div class="line"></div>
+          <p>¡Gracias por su compra!</p>
+          <p>Síguenos en <b>@onewaypizza</b></p>
+
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    ventanaFactura.document.close();
+
+    // 5️⃣ Limpieza final
+    await Swal.fire("Venta completada ✅", "", "success");
+    setCarrito([]);
+    setMontoRecibido("");
+    setDevuelta(0);
+    setMostrarCarrito(false);
+  } catch (err) {
+    console.error("Error al confirmar venta:", err);
+    await Swal.fire("Error", err.message, "error");
+  } finally {
+    setProcesandoVenta(false);
+  }
 }
 
-ventanaFactura.document.open();
-ventanaFactura.document.write(`
-  <!DOCTYPE html>
-  <html lang="es">
-    <head>
-      <meta charset="UTF-8" />
-      <title>Factura - One Way Pizza</title>
-      <style>
-        body {
-          font-family: 'Courier New', monospace;
-          background: #fff;
-          color: #000;
-          width: 302px;
-          margin: 0 auto;
-          text-align: center;
-          padding: 10px;
-        }
-        img.logo {
-          width: 80px;
-          height: auto;
-          margin-bottom: 4px;
-          filter: grayscale(100%);
-        }
-        h2 { margin: 4px 0; }
-        p { margin: 2px 0; }
-        .line { margin: 4px 0; border-bottom: 1px dashed #000; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-        td { padding: 2px 0; }
-        .right { text-align: right; }
-        .center { text-align: center; }
-        button {
-          background: #007bff;
-          color: #fff;
-          border: none;
-          padding: 6px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          margin-top: 10px;
-        }
-      </style>
-    </head>
-    <body>
-      <img src="/OWP-LOGO.png" class="logo" alt="One Way Pizza" />
-      <h2>One Way Pizza</h2>
-      <p>Carretera los Jovillos - Puerto Viejo de Azua</p>
-      <p>Tel:+1 (829) 255-7898</p>
-      <div class="line"></div>
-      <p><b>Factura #${ventaData.id}</b></p>
-      <p>${ventaData.fecha.toLocaleString()}</p>
-      <div class="line"></div>
-
-      <table>
-        <thead>
-          <tr>
-            <td><b>Producto</b></td>
-            <td class="center"><b>Cant</b></td>
-            <td class="right"><b>Precio</b></td>
-          </tr>
-        </thead>
-        <tbody>
-  ${detalles
-    .map((item) => {
-      const precio = Number(item.precio_unitario) || 0;
-      const cantidad = Number(item.cantidad) || 0;
-      return `
-        <tr>
-          <td>${item.nombre}</td>
-          <td class="center">${cantidad}</td>
-          <td class="right">RD$${precio.toFixed(2)}</td>
-        </tr>`;
-    })
-    .join("")}
-</tbody>
-</table>
-
-<div class="line"></div>
-<p class="right"><b>Total:</b> RD$${detalles
-  .reduce((a, b) => a + (Number(b.total) || 0), 0)
-  .toFixed(2)}</p>
-<p class="right"><b>Efectivo:</b> RD$${(Number(efectivoRecibido) || 0).toFixed(2)}</p>
-<p class="right"><b>Devuelta:</b> RD$${(
-  (Number(efectivoRecibido) || 0) -
-  detalles.reduce((a, b) => a + (Number(b.total) || 0), 0)
-).toFixed(2)}</p>
-      <div class="line"></div>
-      <p>Atendido por: <b>${ventaData.empleado}</b></p>
-      <div class="line"></div>
-      <p>¡Gracias por su compra!</p>
-      <p>Síguenos en <b>@onewaypizza</b></p>
-
-      <button onclick="window.print()">🖨️ Imprimir</button>
-    </body>
-  </html>
-`);
-ventanaFactura.document.close();
-
-      // 6️⃣ Finalizar venta
-      await Swal.fire("Venta completada ✅", "", "success");
-      setCarrito([]);
-      setMontoRecibido("");
-      setDevuelta(0);
-      setMostrarCarrito(false);
-    } catch (err) {
-      console.error("Error al confirmar venta:", err);
-      await Swal.fire("Error", err.message, "error");
-    } finally {
-      setProcesandoVenta(false);
-    }
-  }
 
   /* =================== UI =================== */
   if (verificandoCaja) return <p style={{ padding: 20 }}>Cargando...</p>;
