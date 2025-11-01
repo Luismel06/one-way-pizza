@@ -500,7 +500,7 @@ async function retirarDineroHandler() {
           <title>Factura - One Way Pizza</title>
           <style>
             body {
-              font-family: 'Courier New', monospace;
+              font-family: 'Arial Black', Verdana, sans-serif;
               background: #fff;
               color: #000;
               width: 302px;
