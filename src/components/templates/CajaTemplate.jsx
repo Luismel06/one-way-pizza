@@ -564,7 +564,7 @@ ventanaFactura.document.write(`
       </style>
     </head>
     <body>
-      <img src="${window.location.origin}/src/assets/OWP-LOGO.png" class="logo" alt="One Way Pizza" />
+      <img src="/OWP-LOGO.png" class="logo" alt="One Way Pizza" />
       <h2>One Way Pizza</h2>
       <p>Carretera los Jovillos - Puerto Viejo de Azua</p>
       <p>Tel:+1 (829) 255-7898</p>
