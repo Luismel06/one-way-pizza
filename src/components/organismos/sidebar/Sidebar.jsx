@@ -35,7 +35,7 @@ export function Sidebar({ state, setState }) {
   const adminLinks = [
     { icon: "ic:baseline-home", label: "Inicio", to: "/admin/home" },
     { icon: "mdi:finance", label: "Dashboard", to: "/admin/finanzas" },
-    { icon: "mdi:file-chart", label: "Reportes", to: "/admin/reportes" },
+    { icon: "mdi:file-chart", label: "Reportes"},
   ];
 
   const empleadoLinks = [
